@@ -1,0 +1,11 @@
+{
+  "name": "gateway",
+  "version": "1.0.0",
+  "description": "gateway microservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "start"
+  },
+  "author": "Samir Mahmud",
+  "license": "MIT"
+}
