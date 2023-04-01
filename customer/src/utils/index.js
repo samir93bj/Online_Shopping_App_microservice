@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { BadRequestError } = require("../utils/error/app-errors")
 
 const { APP_SECRET } = require("../config");
 
@@ -22,24 +23,22 @@ module.exports.ValidatePassword = async (
 
 module.exports.GenerateSignature = async (payload) => {
   try {
-    return await jwt.sign(payload, APP_SECRET, { expiresIn: "30d" });
+    return await jwt.sign(payload, APP_SECRET, { expiresIn: "1h" });
   } catch (error) {
-    console.log(error);
-    return error;
+    throw new BadRequestError('Token is not valid');
   }
 };
 
 module.exports.ValidateSignature = async (req) => {
-  try {
     const signature = req.get("Authorization");
-    console.log(signature);
+
+		if (!signature)
+			return false
+
     const payload = await jwt.verify(signature.split(" ")[1], APP_SECRET);
     req.user = payload;
+
     return true;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
 };
 
 module.exports.FormateData = (data) => {

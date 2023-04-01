@@ -1,5 +1,7 @@
 .DS_Store
 **/.env
+**/.env.dev
 **/.DS_Store
 **/node_modules
 **/mongo
+.env.dev

@@ -1,11 +1,14 @@
 const { ValidateSignature } = require('../../utils');
+const { AuthorizeError } = require('../../utils/error/app-errors')
 
 module.exports = async (req,res,next) => {
-    
-    const isAuthorized = await ValidateSignature(req);
+	try {
+		const isAuthorized = await ValidateSignature(req);
 
-    if(isAuthorized){
-        return next();
-    }
-    return res.status(403).json({message: 'Not Authorized'})
+		if(!isAuthorized){
+				throw new AuthorizeError('Token is not authorized')
+		}
+	} catch (err) { 
+		next(err)
+	}
 }

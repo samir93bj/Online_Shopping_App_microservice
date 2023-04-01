@@ -10,19 +10,7 @@ const StartServer = async() => {
     await databaseConnection();
     
     await expressApp(app);
-
-
-		app.use((error, req, res, next) => {
-			const statusCode = error.statusCode || 500
-			const data = error.data || error.message
-
-			return res.status(statusCode).json({
-				error: true,
-				status: statusCode,
-				message: data
-			})
-		})
-
+		
     app.listen(PORT, () => {
         console.log(`listening to port ${PORT}`);
     })

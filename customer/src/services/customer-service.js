@@ -11,7 +11,6 @@ class CustomerService {
     }
 
     async SignIn(userInputs){
-
 				const { email, password } = userInputs;
 				const existingCustomer = await this.repository.FindCustomer({ email});
 
@@ -21,31 +20,29 @@ class CustomerService {
 				const validPassword = await ValidatePassword(password, existingCustomer.password, existingCustomer.salt);
 							
 				if(!validPassword)
-					return FormateData(null);
+					throw new NotFoundError('User or password is not valid!');
 					
 				const token = await GenerateSignature({ email: existingCustomer.email, _id: existingCustomer._id});
 				return FormateData({id: existingCustomer._id, token });
     }
 
-		/*
-			TODO: Revisar que no se cree con el mismo user
-		*/
-    async SignUp(userInputs){  
-			try{
+    async SignUp(userInputs){
 				const { email, password, phone } = userInputs;
-					// create salt
-					let salt = await GenerateSalt();
-					
-					let userPassword = await GeneratePassword(password, salt);
-					
-					const existingCustomer = await this.repository.CreateCustomer({ email, password: userPassword, phone, salt});
-					
-					const token = await GenerateSignature({ email: email, _id: existingCustomer._id});
 
-					return FormateData({id: existingCustomer._id, token });
-			}catch(err){
-					throw new APIError('Data Not found', err)
-			}
+				const user = await this.repository.FindCustomer({ email })
+
+				if (user) throw new NotFoundError('User already exist!');
+
+					// create salt
+				let salt = await GenerateSalt();
+				
+				let userPassword = await GeneratePassword(password, salt);
+				
+				const existingCustomer = await this.repository.CreateCustomer({ email, password: userPassword, phone, salt});
+				
+				const token = await GenerateSignature({ email: email, _id: existingCustomer._id});
+
+				return FormateData({id: existingCustomer._id, token });
     }
 
     async AddNewAddress(_id, userInputs){

@@ -4,8 +4,8 @@
   "description": "microservice customer",
   "main": "index.js",
   "scripts": {
-		"start": "cross-env NODE_ENV=prod nodemon src/index.js",
-		"dev": "cross-env NODE_ENV=dev nodemon src/index.js",
+    "start": "cross-env NODE_ENV=prod nodemon src/index.js",
+    "dev": "cross-env NODE_ENV=dev nodemon src/index.js",
     "test": "jest"
   },
   "author": "Samir Mhaud",
@@ -15,6 +15,8 @@
     "nodemon": "^2.0.22"
   },
   "dependencies": {
+    "@sentry/node": "^7.46.0",
+    "@sentry/tracing": "^7.46.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
