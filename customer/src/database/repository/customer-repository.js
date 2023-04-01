@@ -193,10 +193,10 @@ class CustomerRepository {
     try {
       const profile = await CustomerModel.findById(customerId);
 
-      if (profile) {
-        if (profile.orders == undefined) {
-          profile.orders = [];
-        }
+      if (!profile) throw new Error("Unable to add to order!");
+
+      if (profile.orders == undefined) profile.orders = [];
+
         profile.orders.push(order);
 
         profile.cart = [];
@@ -204,9 +204,6 @@ class CustomerRepository {
         const profileResult = await profile.save();
 
         return profileResult;
-      }
-
-      throw new Error("Unable to add to order!");
     } catch (err) {
       throw new APIError(
         "API Error",
