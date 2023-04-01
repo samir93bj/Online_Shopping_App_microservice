@@ -1,17 +1,23 @@
 const express = require('express');
+const { PORT } = require('./config');
+const { databaseConnection } = require('./database');
+const expressApp = require('./express-app');
 
-const app = express();
-const router = express.Router()
+const StartServer = async() => {
 
-app.use(express.json());
-app.use(router)
+    const app = express();
+    
+    await databaseConnection();
+    
+    await expressApp(app);
 
-router.get('/', async (req, res) => {
-	res.status(200).json({
-		message: 'Customer Service: Success up server'
-	})	
-})
+    app.listen(PORT, () => {
+        console.log(`listening to port ${PORT}`);
+    })
+    .on('error', (err) => {
+        console.log(err);
+        process.exit();
+    })
+}
 
-app.listen(8002, () => {
-	console.log('Customer is listening on http://localhost:8002')
-})
+StartServer();
