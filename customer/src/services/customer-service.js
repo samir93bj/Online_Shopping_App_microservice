@@ -1,6 +1,6 @@
 const { CustomerRepository } = require("../database");
 const { FormateData, GeneratePassword, GenerateSalt, GenerateSignature, ValidatePassword } = require('../utils');
-const { APIError, BadRequestError } = require('../utils/app-errors')
+const { APIError, BadRequestError, NotFoundError } = require('../utils/error/app-errors')
 
 
 // All Business logic will be here
@@ -11,12 +11,12 @@ class CustomerService {
     }
 
     async SignIn(userInputs){
-			try {
+
 				const { email, password } = userInputs;
 				const existingCustomer = await this.repository.FindCustomer({ email});
 
 				if(!existingCustomer) 
-					return FormateData(null);
+					throw new NotFoundError('User not found with provided email id!');
 					
 				const validPassword = await ValidatePassword(password, existingCustomer.password, existingCustomer.salt);
 							
@@ -25,12 +25,11 @@ class CustomerService {
 					
 				const token = await GenerateSignature({ email: existingCustomer.email, _id: existingCustomer._id});
 				return FormateData({id: existingCustomer._id, token });
-
-			} catch (err) {
-					throw new APIError('Data Not found', err)
-			}
     }
 
+		/*
+			TODO: Revisar que no se cree con el mismo user
+		*/
     async SignUp(userInputs){  
 			try{
 				const { email, password, phone } = userInputs;
