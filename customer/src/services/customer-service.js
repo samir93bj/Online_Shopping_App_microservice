@@ -20,7 +20,7 @@ class CustomerService {
 					
 				const validPassword = await ValidatePassword(password, existingCustomer.password, existingCustomer.salt);
 							
-				if(validPassword)
+				if(!validPassword)
 					return FormateData(null);
 					
 				const token = await GenerateSignature({ email: existingCustomer.email, _id: existingCustomer._id});
@@ -140,6 +140,9 @@ class CustomerService {
             case 'CREATE_ORDER':
                 this.ManageOrder(userId,order);
                 break;
+						case 'TEST':
+								console.log('WORKING...... subscriber')
+								break;
             default:
                 break;
         }
