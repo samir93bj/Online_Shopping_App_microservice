@@ -14,7 +14,7 @@ module.exports = (app) => {
 	app.use((error, req, res, next) => {
 		let reportError = true;
 
-		[AuthorizeError, BadRequestError].forEach((typeOfError) => {
+		[AuthorizeError, BadRequestError, NotFoundError].forEach((typeOfError) => {
 			if (error instanceof typeOfError) reportError = false;
 		})
 
