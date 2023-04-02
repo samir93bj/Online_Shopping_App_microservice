@@ -1,6 +1,6 @@
 const { ProductRepository } = require("../database");
 const { FormateData } = require("../utils");
-const { APIError } = require('../utils/app-errors');
+const { APIError } = require('../utils/error/app-errors');
 
 // All Business logic will be here
 class ProductService {
@@ -74,6 +74,48 @@ class ProductService {
             throw new APIError('Data Not found')
         }
     }
+
+		async GetProductPayload(userId, { productId, qty}, event) {
+			const product = await this.repository.FindById(productId)
+
+			if (!product) return FormateData({error: 'No product available'})
+
+			const payload = {
+				event: event,
+				data: { userId, product, qty}
+			}
+
+			return FormateData(payload)
+		}
+
+		async SubscribeEvents(payload){
+ 
+			const { event, data } =  payload;
+
+			const { userId, product, order, qty } = data;
+
+			switch(event){
+					case 'ADD_TO_WISHLIST':
+					case 'REMOVE_FROM_WISHLIST':
+							this.AddToWishlist(userId,product)
+							break;
+					case 'ADD_TO_CART':
+							this.ManageCart(userId,product, qty, false);
+							break;
+					case 'REMOVE_FROM_CART':
+							this.ManageCart(userId,product,qty, true);
+							break;
+					case 'CREATE_ORDER':
+							this.ManageOrder(userId,order);
+							break;
+					case 'TEST':
+							console.log('WORKING...... subscriber')
+							break;
+					default:
+							break;
+			}
+
+	}
      
 }
 

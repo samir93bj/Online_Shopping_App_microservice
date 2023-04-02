@@ -1,7 +1,7 @@
 const express = require('express');
 const cors  = require('cors');
-const { customer, products, shopping } = require('./api');
-const HandleErrors = require('./utils/error-handler')
+const { products, appEvent } = require('./api');
+const errorHandlerSentry = require('./utils/error/sentry')
 
 
 module.exports = async (app) => {
@@ -12,11 +12,10 @@ module.exports = async (app) => {
     app.use(express.static(__dirname + '/public'))
 
     //api
-    customer(app);
     products(app);
-    shopping(app);
+		appEvent(app);
 
     // error handling
-    app.use(HandleErrors);
+    errorHandlerSentry(app)
     
 }
