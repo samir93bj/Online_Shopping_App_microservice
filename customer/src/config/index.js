@@ -2,9 +2,11 @@ const dotEnv = require("dotenv");
 
 let env = process.env.NODE_ENV | 'prod'
 
-if (env !== "prod") {
+if (env == "prod") {
   const configFile = `./.env.${process.env.NODE_ENV}`;
+	console.log(configFile)
   dotEnv.config({ path: configFile });
+
 } else {
   dotEnv.config();
 }

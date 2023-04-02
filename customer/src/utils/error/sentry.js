@@ -9,16 +9,13 @@ module.exports = (app) => {
 		tracesSampleRate: 1.0,
 	});
 
-	console.log(config.SENTRY_DNS);
-
 	app.use((error, req, res, next) => {
 		let reportError = true;
 
-		[AuthorizeError, BadRequestError, NotFoundError].forEach((typeOfError) => {
+		[AuthorizeError, BadRequestError].forEach((typeOfError) => {
 			if (error instanceof typeOfError) reportError = false;
 		})
 
-		console.log(reportError, error)
 		if (reportError) Sentry.captureException(error);
 
 		const statusCode = error.statusCode || 500
