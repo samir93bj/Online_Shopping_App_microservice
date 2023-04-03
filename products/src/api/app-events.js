@@ -10,6 +10,6 @@ module.exports = (app) => {
 
 		console.log('========== Product service Received Event ==========')
 		
-		return res.status(200).json({ payload })
+		return res.status(200).json(payload)
 	})
 }

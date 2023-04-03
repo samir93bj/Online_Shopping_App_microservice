@@ -6,6 +6,9 @@ module.exports = (app) => {
     
     const service = new ProductService();
 
+		/*
+			TODO: add authorization validation
+		*/
     app.post('/product/create', async(req,res,next) => {
         
         try {
@@ -66,9 +69,9 @@ module.exports = (app) => {
         const { _id } = req.user;
         const { data } = await service.GetProductPayload(_id, { productId: req.body._id }, 'ADD_TO_WISHLIST')
         
-						PublishCustomerEvent(data)
-            
-            return res.status(200).json(data, data.product);
+						await PublishCustomerEvent(data)
+
+            return res.status(200).json(data);
 			} catch (err) {
 				next(err)
       }
