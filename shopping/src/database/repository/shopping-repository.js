@@ -96,6 +96,7 @@ class ShoppingRepository {
 
         const orderResult = await order.save()
         await cart.save()
+
         return orderResult
       }
     }
