@@ -1,41 +1,69 @@
-const ShoppingService = require('../services/shopping-service')
-const UserService = require('../services/customer-service')
-const UserAuth = require('./middlewares/auth')
+const { ShoppingRepository } = require('../database')
+const { FormateData } = require('../utils')
 
-module.exports = (app) => {
-  const service = new ShoppingService()
-  const userService = new UserService()
+// All Business logic will be here
+class ShoppingService {
+  constructor () {
+    this.repository = new ShoppingRepository()
+  }
 
-  app.post('/shopping/order', UserAuth, async (req, res, next) => {
-    const { _id } = req.user
-    const { txnNumber } = req.body
+  async GetCart ({ _id }) {
+    const cartItems = await this.repository.Cart(_id)
+    return FormateData(cartItems)
+  }
 
-    try {
-      const { data } = await service.PlaceOrder({ _id, txnNumber })
-      return res.status(200).json(data)
-    } catch (err) {
-      next(err)
+  async PlaceOrder (userInput) {
+    const { _id, txnNumber } = userInput
+
+    const orderResult = await this.repository.CreateNewOrder(_id, txnNumber)
+
+    return FormateData(orderResult)
+  }
+
+  async GetOrders (customerId) {
+    const orders = await this.repository.Orders(customerId)
+    return FormateData(orders)
+  }
+
+  async GetOrderDetails ({ _id, orderId }) {
+    const orders = await this.repository.Orders(_id)
+    return FormateData(orders)
+  }
+
+  async ManageCart (customerId, item, qty, isRemove) {
+    const cartResult = await this.repository.AddCartItem(customerId, item, qty, isRemove)
+    return FormateData(cartResult)
+  }
+
+  async SubscribeEvents (payload) {
+    payload = JSON.parse(payload)
+    const { event, data } = payload
+    const { userId, product, qty } = data
+
+    switch (event) {
+      case 'ADD_TO_CART':
+        this.ManageCart(userId, product, qty, false)
+        break
+      case 'REMOVE_FROM_CART':
+        this.ManageCart(userId, product, qty, true)
+        break
+      default:
+        break
     }
-  })
+  }
 
-  app.get('/shopping/orders', UserAuth, async (req, res, next) => {
-    const { _id } = req.user
+  async GetOrderPayload (userId, order, event) {
+    if (order) {
+      const payload = {
+        event,
+        data: { userId, order }
+      }
 
-    try {
-      const { data } = await userService.GetShopingDetails(_id)
-      return res.status(200).json(data.orders)
-    } catch (err) {
-      next(err)
+      return payload
+    } else {
+      return FormateData({ error: 'No Order Available' })
     }
-  })
-
-  app.get('/shopping/cart', UserAuth, async (req, res, next) => {
-    const { _id } = req.user
-    try {
-      const { data } = await userService.GetShopingDetails(_id)
-      return res.status(200).json(data.cart)
-    } catch (err) {
-      next(err)
-    }
-  })
+  }
 }
+
+module.exports = ShoppingService
