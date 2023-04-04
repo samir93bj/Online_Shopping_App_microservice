@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 const { OrderModel, CartModel } = require('../models')
 const { v4: uuidv4 } = require('uuid')
-const { APIError, STATUS_CODES } = require('../../utils/app-errors')
+const { APIError, STATUS_CODES } = require('../../utils/error/app-errors')
 
 class ShoppingRepository {
   async Orders (customerId) {

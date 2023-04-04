@@ -1,8 +1,8 @@
 /* eslint-disable n/no-path-concat */
 const express = require('express')
 const cors = require('cors')
-const { customer, products, shopping } = require('./api')
-const HandleErrors = require('./utils/error-handler')
+const { shopping } = require('./api')
+const errorHandlerSentry = require('./utils/error/sentry')
 
 module.exports = async (app) => {
   app.use(express.json({ limit: '1mb' }))
@@ -11,10 +11,8 @@ module.exports = async (app) => {
   app.use(express.static(__dirname + '/public'))
 
   // api
-  customer(app)
-  products(app)
   shopping(app)
 
   // error handling
-  app.use(HandleErrors)
+  errorHandlerSentry(app)
 }

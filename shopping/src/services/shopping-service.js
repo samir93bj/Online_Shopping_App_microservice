@@ -1,6 +1,6 @@
 const { ShoppingRepository } = require('../database')
 const { FormateData } = require('../utils')
-const { APIError } = require('../utils/app-errors')
+const { APIError } = require('../utils/error/app-errors')
 
 // All Business logic will be here
 class ShoppingService {

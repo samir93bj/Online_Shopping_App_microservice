@@ -1,69 +1,61 @@
-const { ShoppingRepository } = require('../database')
-const { FormateData } = require('../utils')
+const ShoppingService = require('../services/shopping-service')
+const UserAuth = require('./middlewares/auth')
 
-// All Business logic will be here
-class ShoppingService {
-  constructor () {
-    this.repository = new ShoppingRepository()
-  }
+module.exports = (app) => {
+  const service = new ShoppingService()
 
-  async GetCart ({ _id }) {
-    const cartItems = await this.repository.Cart(_id)
-    return FormateData(cartItems)
-  }
+  app.post('/order', UserAuth, async (req, res, next) => {
+    const { _id } = req.user
+    const { txnNumber } = req.body
 
-  async PlaceOrder (userInput) {
-    const { _id, txnNumber } = userInput
+    try {
+      const { data } = await service.PlaceOrder({ _id, txnNumber })
+      const payload = await service.GetOrderPayload(_id, data, 'CREATE_ORDER')
 
-    const orderResult = await this.repository.CreateNewOrder(_id, txnNumber)
-
-    return FormateData(orderResult)
-  }
-
-  async GetOrders (customerId) {
-    const orders = await this.repository.Orders(customerId)
-    return FormateData(orders)
-  }
-
-  async GetOrderDetails ({ _id, orderId }) {
-    const orders = await this.repository.Orders(_id)
-    return FormateData(orders)
-  }
-
-  async ManageCart (customerId, item, qty, isRemove) {
-    const cartResult = await this.repository.AddCartItem(customerId, item, qty, isRemove)
-    return FormateData(cartResult)
-  }
-
-  async SubscribeEvents (payload) {
-    payload = JSON.parse(payload)
-    const { event, data } = payload
-    const { userId, product, qty } = data
-
-    switch (event) {
-      case 'ADD_TO_CART':
-        this.ManageCart(userId, product, qty, false)
-        break
-      case 'REMOVE_FROM_CART':
-        this.ManageCart(userId, product, qty, true)
-        break
-      default:
-        break
+      return res.status(200).json(payload)
+    } catch (err) {
+      next(err)
     }
-  }
+  })
 
-  async GetOrderPayload (userId, order, event) {
-    if (order) {
-      const payload = {
-        event,
-        data: { userId, order }
-      }
+  app.get('/orders', UserAuth, async (req, res, next) => {
+    const { _id } = req.user
 
-      return payload
-    } else {
-      return FormateData({ error: 'No Order Available' })
+    try {
+      const { data } = await service.GetOrders(_id)
+      return res.status(200).json(data)
+    } catch (err) {
+      next(err)
     }
-  }
+  })
+
+  app.get('/cart', UserAuth, async (req, res, next) => {
+    const { _id } = req.user
+    try {
+      const { data } = await service.AddToCart(_id, req.body._id)
+      return res.status(200).json(data.cart)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.delete('/cart/:id', UserAuth, async (req, res, next) => {
+    const { _id } = req.user
+
+    const { data } = await service.AddToCart(_id, req.body._id)
+
+    res.status(200).json(data)
+  })
+
+  app.get('/cart', UserAuth, async (req, res, next) => {
+    const { _id } = req.user
+
+    const { data } = await service.GetCart({ _id })
+
+    return res.status(200).json(data)
+  })
+
+  app.get('/whoami', (req, res, next) => {
+    return res.status(200).json({ msg: '/shoping : I am Shopping Service' })
+  })
 }
-
-module.exports = ShoppingService
