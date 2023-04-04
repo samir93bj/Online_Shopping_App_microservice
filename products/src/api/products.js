@@ -98,8 +98,8 @@ module.exports = (app) => {
 
 				const { data } = await service.GetProductPayload(_id, { productId: req.body._id, qty: req.body.qty }, 'ADD_TO_CART')
 				
-				PublishCustomerEvent(data);
-				PublishShoppingEvent(data);
+				await PublishCustomerEvent(data);
+				await PublishShoppingEvent(data);
 
 				const response = {
 					product: data.data.product,
