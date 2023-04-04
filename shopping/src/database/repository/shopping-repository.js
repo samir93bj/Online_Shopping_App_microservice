@@ -1,11 +1,9 @@
-const { CustomerModel, OrderModel } = require('../models')
+/* eslint-disable array-callback-return */
+const { OrderModel, CartModel } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { APIError, STATUS_CODES } = require('../../utils/app-errors')
 
-// Dealing with data base operations
 class ShoppingRepository {
-  // payment
-
   async Orders (customerId) {
     try {
       const orders = await OrderModel.find({ customerId })
@@ -15,52 +13,94 @@ class ShoppingRepository {
     }
   }
 
-  async CreateNewOrder (customerId, txnId) {
-    // check transaction for payment Status
-
+  async Cart (CustomerId) {
     try {
-      const profile = await CustomerModel.findById(customerId).populate('cart.product')
+      const cartItems = await CartModel.find({
+        customerId: CustomerId
+      })
 
-      if (profile) {
-        let amount = 0
+      if (!cartItems) throw APIError('Data Not Found', STATUS_CODES.NOT_FOUND)
 
-        const cartItems = profile.cart
+      return cartItems
+    } catch (err) {
+      throw APIError('API Error', STATUS_CODES.INTERNAL_ERROR, 'Unable to Find Carts')
+    }
+  }
 
-        if (cartItems.length > 0) {
-          // process Order
-          // eslint-disable-next-line array-callback-return
-          cartItems.map((item) => {
-            amount += parseInt(item.product.price) * parseInt(item.unit)
-          })
+  async AddCartItem (customerId, item, qty, isRemove) {
+    const cart = await CartModel.findOne({ customerId })
 
-          const orderId = uuidv4()
+    const { _id } = item
 
-          const order = new OrderModel({
-            orderId,
-            customerId,
-            amount,
-            txnId,
-            status: 'received',
-            items: cartItems
-          })
+    if (cart) {
+      let isExist = false
 
-          profile.cart = []
+      const cartItems = cart.items
 
-          order.populate('items.product').execPopulate()
-          const orderResult = await order.save()
-
-          profile.orders.push(orderResult)
-
-          await profile.save()
-
-          return orderResult
-        }
+      if (cartItems.length > 0) {
+        cartItems.map(item => {
+          if (item.product._id.toString() === _id.toString()) {
+            if (isRemove) {
+              cartItems.splice(cartItems.indexOf(item), 1)
+            } else {
+              item.unit = qty
+            }
+            isExist = true
+          }
+        })
       }
 
-      return {}
-    } catch (err) {
-      throw APIError('API Error', STATUS_CODES.INTERNAL_ERROR, 'Unable to Find Category')
+      if (!isExist && !isRemove) {
+        cartItems.push({ product: { ...item }, unit: qty })
+      }
+
+      cart.items = cartItems
+
+      return await cart.save()
+    } else {
+      return await CartModel.create({
+        customerId,
+        items: [{ product: { ...item }, unit: qty }]
+      })
     }
+  }
+
+  async CreateNewOrder (customerId, txnId) {
+    // required to verify payment through TxnId
+
+    const cart = await CartModel.findOne({ customerId })
+
+    if (cart) {
+      let amount = 0
+
+      const cartItems = cart.items
+
+      if (cartItems.length > 0) {
+        // process Order
+
+        cartItems.map(item => {
+          amount += parseInt(item.product.price) * parseInt(item.unit)
+        })
+
+        const orderId = uuidv4()
+
+        const order = new OrderModel({
+          orderId,
+          customerId,
+          amount,
+          status: 'received',
+          items: cartItems
+        })
+
+        cart.items = []
+
+        const orderResult = await order.save()
+        await cart.save()
+        return orderResult
+      }
+    }
+
+    return {}
   }
 }
 
