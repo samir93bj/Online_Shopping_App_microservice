@@ -3,11 +3,11 @@ const STATUS_CODES = {
   BAD_REQUEST: 400,
   UN_AUTHORISED: 403,
   NOT_FOUND: 404,
-  INTERNAL_ERROR: 500,
-};
+  INTERNAL_ERROR: 500
+}
 
 class AppError extends Error {
-  constructor(
+  constructor (
     name,
     statusCode,
     description,
@@ -15,53 +15,53 @@ class AppError extends Error {
     errorStack,
     logingErrorResponse
   ) {
-    super(description);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = name;
-    this.statusCode = statusCode;
-    this.isOperational = isOperational;
-    this.errorStack = errorStack;
-    this.logError = logingErrorResponse;
-    Error.captureStackTrace(this);
+    super(description)
+    Object.setPrototypeOf(this, new.target.prototype)
+    this.name = name
+    this.statusCode = statusCode
+    this.isOperational = isOperational
+    this.errorStack = errorStack
+    this.logError = logingErrorResponse
+    Error.captureStackTrace(this)
   }
 }
 
-//api Specific Errors
+// api Specific Errors
 class APIError extends AppError {
-  constructor(
+  constructor (
     name,
     statusCode = STATUS_CODES.INTERNAL_ERROR,
-    description = "Internal Server Error",
+    description = 'Internal Server Error',
     isOperational = true
   ) {
-    super(name, statusCode, description, isOperational);
+    super(name, statusCode, description, isOperational)
   }
 }
 
-//400
+// 400
 class BadRequestError extends AppError {
-  constructor(description = "Bad request", logingErrorResponse) {
+  constructor (description = 'Bad request', logingErrorResponse) {
     super(
-      "NOT FOUND",
+      'NOT FOUND',
       STATUS_CODES.BAD_REQUEST,
       description,
       true,
       false,
       logingErrorResponse
-    );
+    )
   }
 }
 
-//400
+// 400
 class ValidationError extends AppError {
-  constructor(description = "Validation Error", errorStack) {
+  constructor (description = 'Validation Error', errorStack) {
     super(
-      "BAD REQUEST",
+      'BAD REQUEST',
       STATUS_CODES.BAD_REQUEST,
       description,
       true,
       errorStack
-    );
+    )
   }
 }
 
@@ -70,5 +70,5 @@ module.exports = {
   APIError,
   BadRequestError,
   ValidationError,
-  STATUS_CODES,
-};
+  STATUS_CODES
+}
