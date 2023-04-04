@@ -1,6 +1,6 @@
 const { CustomerModel, OrderModel } = require('../models')
 const { v4: uuidv4 } = require('uuid')
-const { APIError, BadRequestError } = require('../../utils/app-errors')
+const { APIError, STATUS_CODES } = require('../../utils/app-errors')
 
 // Dealing with data base operations
 class ShoppingRepository {
@@ -28,7 +28,8 @@ class ShoppingRepository {
 
         if (cartItems.length > 0) {
           // process Order
-          cartItems.map(item => {
+          // eslint-disable-next-line array-callback-return
+          cartItems.map((item) => {
             amount += parseInt(item.product.price) * parseInt(item.unit)
           })
 

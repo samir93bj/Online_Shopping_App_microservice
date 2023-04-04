@@ -1,7 +1,7 @@
+/* eslint-disable array-callback-return */
 const { CustomerModel, AddressModel } = require('../models')
 const {
   APIError,
-  BadRequestError,
   STATUS_CODES
 } = require('../../utils/app-errors')
 
@@ -197,7 +197,7 @@ class CustomerRepository {
       const profile = await CustomerModel.findById(customerId)
 
       if (profile) {
-        if (profile.orders == undefined) {
+        if (profile.orders === undefined) {
           profile.orders = []
         }
         profile.orders.push(order)

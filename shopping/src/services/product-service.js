@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 const { ProductRepository } = require('../database')
 const { FormateData } = require('../utils')
 const { APIError } = require('../utils/app-errors')

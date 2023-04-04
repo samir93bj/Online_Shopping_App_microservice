@@ -1,3 +1,4 @@
+/* eslint-disable n/no-path-concat */
 const express = require('express')
 const cors = require('cors')
 const { customer, products, shopping } = require('./api')

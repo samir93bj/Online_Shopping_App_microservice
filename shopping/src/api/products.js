@@ -106,7 +106,7 @@ module.exports = (app) => {
     try {
       const { data } = await service.GetProducts()
       return res.status(200).json(data)
-    } catch (error) {
+    } catch (err) {
       next(err)
     }
   })
