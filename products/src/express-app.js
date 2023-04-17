@@ -4,7 +4,7 @@ const { products, appEvent } = require('./api');
 const errorHandlerSentry = require('./utils/error/sentry')
 
 
-module.exports = async (app) => {
+module.exports = async (app, channel) => {
 
     app.use(express.json({ limit: '1mb'}));
     app.use(express.urlencoded({ extended: true, limit: '1mb'}));
@@ -12,7 +12,7 @@ module.exports = async (app) => {
     app.use(express.static(__dirname + '/public'))
 
     //api
-    products(app);
+    products(app, channel);
 		appEvent(app);
 
     // error handling
