@@ -4,7 +4,7 @@ const { customer, appEvent } = require('./api');
 const errorHandler = require('./api/middlewares/error')
 const errorHandlerSentry = require('./utils/error/sentry')
 
-module.exports = async (app) => {
+module.exports = async (app, channel) => {
 
     app.use(express.json({ limit: '1mb'}));
     app.use(express.urlencoded({ extended: true, limit: '1mb'}));
@@ -14,7 +14,7 @@ module.exports = async (app) => {
 		appEvent(app)
 
     //api
-    customer(app);
+    customer(app, channel);
 
     // error handling
 		errorHandlerSentry(app)
