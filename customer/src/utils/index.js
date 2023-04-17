@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { BadRequestError } = require("../utils/error/app-errors")
 const amqplib = require('amqplib');
-const { MESSAGE_BROKER_URL, EXCHANGE_NAME, SHOPPING_BINDING_KEY, PRODUCT_BINDING_KEY } = require('../config');
+const { MESSAGE_BROKER_URL, EXCHANGE_NAME, QUEUE_NAME, CUSTOMER_BINDING_KEY } = require('../config');
 
 const { APP_SECRET } = require("../config");
 
@@ -54,7 +54,9 @@ module.exports.FormateData = (data) => {
 
 /********************************* MESSAGE BROKER ************************************/
 
-/* Create a channel*/
+/* 
+ 	- Create a channel
+*/
 module.exports.CreateChannel = async () => {
 	try {
 		const connection = await amqplib.connect(MESSAGE_BROKER_URL);
@@ -68,7 +70,9 @@ module.exports.CreateChannel = async () => {
 	}
 };
 
-/* publish messages */
+/* 
+	- publish messages 
+*/
 module.exports.PublishMessage = async (channel, binding_key, message) => {
 	try {
 		await channel.publish(EXCHANGE_NAME, binding_key, Buffer.from(message));
@@ -77,17 +81,21 @@ module.exports.PublishMessage = async (channel, binding_key, message) => {
 	}
 };
 
-/* subscribe message */
-module.exports.SubscriberMessage = async (channel, service, binding_key) => {
+/* 
+	- subscribe message 
+*/
+module.exports.SubscriberMessage = async (channel, service) => {
 	try {
-		const appQueue = await channel.assertQueue(EXCHANGE_NAME);
+		const appQueue = await channel.assertQueue(QUEUE_NAME);
 
-		channel.bindQueue(appQueue.queue, EXCHANGE_NAME, binding_key);
+		channel.bindQueue(appQueue.queue, EXCHANGE_NAME, CUSTOMER_BINDING_KEY);
 		
 		channel.consume(appQueue.queue, data => {
 			console.log('Recived Data');
 			console.log(data.content.toString());
-			channel.ask(data);
+			channel.ack(data);
+			return data.content.toString();
+			
 		});
 
 	} catch (error) {
