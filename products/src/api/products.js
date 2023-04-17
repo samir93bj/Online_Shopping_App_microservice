@@ -105,7 +105,9 @@ module.exports = (app, channel) => {
 				// await PublishCustomerEvent(data);
 				PublishMessage(channel, CUSTOMER_BINDING_KEY, JSON.stringify(data))
 
-			 	await PublishShoppingEvent(data);
+			 	//await PublishShoppingEvent(data);
+				PublishMessage(channel, SHOPPING_BINDING_KEY, JSON.stringify(data))
+		
 
 				const response = {
 					product: data.data.product,
@@ -128,8 +130,9 @@ module.exports = (app, channel) => {
 
         // PublishCustomerEvent(data);
 				PublishMessage(channel, CUSTOMER_BINDING_KEY, JSON.stringify(data))
-				
-				PublishShoppingEvent(data);
+
+				//PublishShoppingEvent(data);
+				PublishMessage(channel, SHOPPING_BINDING_KEY, JSON.stringify(data))
 
 				const response = {
 					product: data.data.product,
