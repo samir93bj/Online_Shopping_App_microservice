@@ -94,6 +94,7 @@ module.exports.SubscriberMessage = async (channel, service) => {
 			console.log('Recived Data');
 			console.log(data.content.toString());
 			channel.ack(data);
+			service.SubscribeEvents(data.content.toString());
 			return data.content.toString();
 			
 		});

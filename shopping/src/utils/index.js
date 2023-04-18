@@ -1,8 +1,9 @@
+/* eslint-disable no-useless-catch */
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const axios = require('axios')
+const amqplib = require('amqplib')
 
-const { APP_SECRET } = require('../config')
+const { APP_SECRET, MESSAGE_BROKER_URL, EXCHANGE_NAME, QUEUE_NAME, SHOPPING_BINDING_KEY } = require('../config')
 
 // Utility functions
 module.exports.GenerateSalt = async () => {
@@ -51,8 +52,52 @@ module.exports.FormateData = (data) => {
   }
 }
 
-module.exports.PublishCustomerEvent = async (payload) => {
-  await axios.post('http://localhost:8000/customer/app-events', {
-    payload
-  })
+/** ******************************* MESSAGE BROKER ************************************/
+
+/*
+  - Create a channel
+*/
+module.exports.CreateChannel = async () => {
+  try {
+    const connection = await amqplib.connect(MESSAGE_BROKER_URL)
+    const channel = await connection.createChannel()
+
+    await channel.assertExchange(EXCHANGE_NAME, 'direct', false)
+    return channel
+  } catch (error) {
+    throw error
+  }
+}
+
+/*
+- publish messages
+*/
+// eslint-disable-next-line camelcase
+module.exports.PublishMessage = async (channel, binding_key, message) => {
+  try {
+    await channel.publish(EXCHANGE_NAME, binding_key, Buffer.from(message))
+  } catch (error) {
+    throw error
+  }
+}
+
+/*
+- subscribe message
+*/
+module.exports.SubscriberMessage = async (channel, service) => {
+  try {
+    const appQueue = await channel.assertQueue(QUEUE_NAME)
+
+    channel.bindQueue(appQueue.queue, EXCHANGE_NAME, SHOPPING_BINDING_KEY)
+
+    channel.consume(appQueue.queue, data => {
+      console.log('Recived Data in shopping')
+
+      service.SubscribeEvents(data.content.toString())
+      channel.ack(data)
+      return data.content.toString()
+    })
+  } catch (error) {
+    throw error
+  }
 }
