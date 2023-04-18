@@ -15,7 +15,7 @@ module.exports = (app, channel) => {
       const { data } = await service.PlaceOrder({ _id, txnNumber })
       const payload = await service.GetOrderPayload(_id, data, 'CREATE_ORDER')
 
-      PublishMessage(channel, CUSTOMER_BINDING_KEY, payload)
+      PublishMessage(channel, CUSTOMER_BINDING_KEY, JSON.stringify(payload))
 
       return res.status(200).json(payload)
     } catch (err) {
@@ -42,8 +42,7 @@ module.exports = (app, channel) => {
     } catch (err) {
       next(err)
     }
-  })
-  */
+  })*/
 
   app.delete('/cart/:id', UserAuth, async (req, res, next) => {
     const { _id } = req.user
