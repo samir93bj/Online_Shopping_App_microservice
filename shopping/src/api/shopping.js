@@ -34,7 +34,7 @@ module.exports = (app, channel) => {
     }
   })
 
-  app.get('/cart', UserAuth, async (req, res, next) => {
+/*  app.get('/cart', UserAuth, async (req, res, next) => {
     const { _id } = req.user
     try {
       const { data } = await service.AddToCart(_id, req.body._id)
@@ -43,6 +43,7 @@ module.exports = (app, channel) => {
       next(err)
     }
   })
+  */
 
   app.delete('/cart/:id', UserAuth, async (req, res, next) => {
     const { _id } = req.user
