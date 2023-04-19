@@ -60,6 +60,7 @@ module.exports.FormateData = (data) => {
 module.exports.CreateChannel = async () => {
 	try {
 		const connection = await amqplib.connect(MESSAGE_BROKER_URL);
+		console.log(connection)
 		const channel = await connection.createChannel();
 	
 		await channel.assertExchange(EXCHANGE_NAME, 'direct', false);
