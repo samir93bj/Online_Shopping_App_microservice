@@ -8,3 +8,5 @@
 .rabbitmq_data
 **/.rabbitmq_data
 **./rabbitmq_data
+db
+./db

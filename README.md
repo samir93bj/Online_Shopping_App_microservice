@@ -16,6 +16,6 @@ This is a practical source code of the NodeJS Microservice tutorial serise. Wher
 This repository is published for educational purpose only. If the concept of the business logic matching with any project belongs to any organization it may be a co-incident. The main purpose of this repository is only to educate people by contributing practical knowledge.
 </br>
 
-POSTMAN Collection
+POSTMAN Collections
 </br>
 https://github.com/samir93bj/Online_Shopping_App_monolothic/blob/master/Microservices%20Tutorial.postman_collection.json
