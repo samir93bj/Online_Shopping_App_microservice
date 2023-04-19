@@ -86,8 +86,9 @@ module.exports = (app, channel) => {
         const productId = req.params.id;
 				const { data } = await service.GetProductPayload(_id, { productId }, 'REMOVE_TO_WISHLIST')
 
+				console.log('DATA', data);
 				// PublishCustomerEvent(data)
-				PublishMessage(channel, CUSTOMER_BINDING_KEY, JSON.stringify(data))
+				await PublishMessage(channel, CUSTOMER_BINDING_KEY, JSON.stringify(data))
 				
 				return res.status(200).json(data.data.product);
       } catch (err) {

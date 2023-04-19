@@ -126,10 +126,10 @@ class CustomerService {
 
         switch(event){
             case 'ADD_TO_WISHLIST':
-								console.log('Estamos en este evento')
 								this.AddToWishlist(userId,product)
 							break;
-            case 'REMOVE_FROM_WISHLIST':
+            case 'REMOVE_TO_WISHLIST':
+								console.log('Estamos en este evento REMOVE_TO_WISHLIST')
                 this.AddToWishlist(userId,product)
                 break;
             case 'ADD_TO_CART':
